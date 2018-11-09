@@ -20,8 +20,10 @@ def get_messages(course_id):
 
         elif 'message' in m.keys() and m['type'] == 'answer':
             a_dict[m['_id']] = m
-
-    stored_questions = set([x['question'] for x in xiaomu.gen_qa_pair.find({"course_id": course_id})])
+    
+    print(course_id)
+    stored_questions = set([x['question'] for x in xiaomu.qa_annotation.find({"course_id": course_id})])
+    
     q_text, a_text, times, tags = [], [], [], []
     for k, v in a_dict.items():
         if 'origin_question' not in v.keys():

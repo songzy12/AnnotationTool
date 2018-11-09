@@ -43,18 +43,9 @@ def main():
 @app.route('/gen_qa_pair', methods=['POST'])
 def add_pre():
     # we store the annotated pair into mongo datebase
-    time = request.form["time"]
-    tag = request.form["tag"]
-    score = request.form["score"]
-    question = request.form["question"]
-    answer = request.form["answer"]
-    evaluate = request.form["evaluate"]
-    course = request.form["course"]
-    amended_q = request.form["amended_q"]
-    amended_a = request.form["amended_a"]
-    xiaomu.gen_qa_pair.insert({"time": time, "tag": tag, "score": score, "question": question, "answer": answer,
-                               "evaluate": evaluate, "amended_q": amended_q, "amended_a": amended_a, "human_add": True, "course_id": course})
-    return redirect('/message/'+course)
+    course_id = request.form["course_id"]
+    xiaomu.qa_annotation.insert({k:v for k, v in request.form.items()})
+    return redirect('/message/'+course_id)
 
 
 if __name__ == '__main__':
