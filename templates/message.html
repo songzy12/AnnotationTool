@@ -1,0 +1,36 @@
+<table border="1" align="center">
+<tr>
+    <th width="150"> time </th>
+    <th width="150"> tag </th>
+    <th width="800"> question</th>
+    <th width="800"> answer </th>
+    <th width="1200"> evaluation </th>
+</tr>
+{% for q, a, t, time in q_a%}
+<tr>
+	<form  action='/gen_qa_pair' method="post" id="gen_qa_pair">
+ 	<td width="150">{{time}}</td>
+    <td width="150">{{t}}</td>
+    <td width="800">{{q}}</td>
+    <td width="800">{{a}}</td>
+	<input type="hidden" name="time" value ="{{time}}"/>
+    <input type="hidden" name="tag" value ="{{t}}"/>
+    <input type="hidden" name="question" value ="{{q}}"/>
+	<input type="hidden" name="answer" value ="{{a}}"/>    
+	<input type="hidden" name="course_id" value="{{course}}">
+	<td width="1200">
+	<input type="radio" name="evaluate" value="good pair">Good pair<br>
+	<input type="radio" name="evaluate" value="good question">Good question<br>
+	<input type="radio" name="evaluate" value="bad">Bad<br>
+	edit question:<br>
+	<input class="form-control" type="text" name="amended_q" style="width:200px"/><br>
+	edit answer:<br>
+	<input class="form-control" type="text" name="amended_a" style="width:200px"/><br>
+	<input class="btn btn-default" type="submit" value="Save" />
+	</td>
+	</form>  
+<tr>
+{%endfor%}
+</table>
+
+
