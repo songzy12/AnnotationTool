@@ -8,7 +8,7 @@ from read_message import get_messages
 
 sys.path.append("/home/xiaomu/xiaomu")
 
-client = MongoClient('mongodb://localhost:27017')
+client = MongoClient('mongodb://10.0.2.180:27017')
 xiaomu = client.xiaomu
 
 app = Flask(__name__)

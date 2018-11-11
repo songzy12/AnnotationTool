@@ -3,14 +3,14 @@ from datetime import datetime
 import numpy as np
 import time
 
-client = MongoClient('mongodb://localhost:27017')
+client = MongoClient('mongodb://10.0.2.180:27017')
 xiaomu = client.xiaomu
 message = xiaomu.message
 
 
 def get_messages(course_id):
     message_set = message.find(
-        {'course_id': course_id, 'flag': None, 'question_source': None}).sort('_id', -1)
+        {'course_id': course_id, 'flag': {"$in": [None, 'more', 'try', "cached", "cached_more"]}, 'question_source': None}).sort('_id', -1)
     q_dict, a_dict = {}, {}
     for m in message_set:
         if 'flag' in m.keys() and m['flag'] == 'say_hello':
@@ -36,8 +36,9 @@ def get_messages(course_id):
         if q_dict[q_id]['message'] in stored_questions:
             continue
 
-        q_text.append(q_dict[q_id]['message'])
-        a_text.append(v['message'].replace('<br>', ' '))
+        q_text.append(q_dict[q_id]['message'])        
+        # a_text.append(v['message'].replace('<br>', ' '))
+        a_text.append(v['message'])        
         times.append(v['time'])
         tags.append(v.get('tag', -1))
 
