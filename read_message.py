@@ -44,4 +44,5 @@ def get_messages(course_id):
 
     sort_index = np.argsort([time.mktime(x.timetuple()) for x in times])[::-1]
 
-    return np.asarray(a_text)[sort_index], np.asarray(q_text)[sort_index], np.asarray(times)[sort_index], np.asarray(tags)[sort_index]
+    response = [np.asarray(a_text)[sort_index], np.asarray(q_text)[sort_index], np.asarray(times)[sort_index], np.asarray(tags)[sort_index]]
+    return [x[:100] for x in response]
