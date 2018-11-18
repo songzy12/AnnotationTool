@@ -26,33 +26,44 @@
 			<th> qid </th>
 			<th> time </th>
 			<th> question</th>
-			<th> category </th>
 			<th> answer </th>
 			<th> evaluation </th>
 		</tr>
-		{% for qid, q, a, t, time in q_a%}
+		{% for qid, q, a, time in q_a%}
 		<tr>
 			<form action='/gen_qa_pair' method="post" id="gen_qa_pair">
 				<td width=13%>{{qid}}</td>
 				<td width=13%>{{time}}</td>
 				<td width=15%>{{q}}</td>
-				<td width=15%>{{t}}</td>
-				<td width=50%>{{a}}</td>				
+				<td width=50%>{{a}}</td>
 
 				<input type="hidden" name="qid" value="{{qid}}" />
 				<input type="hidden" name="time" value="{{time}}" />
 				<input type="hidden" name="question" value="{{q}}" />
-				<input type="hidden" name="tag" value="{{t}}" />
 				<input type="hidden" name="answer" value="{{a}}" />
 				<input type="hidden" name="course_id" value="{{course}}">
+
 				<td width=30%>
-					<input type="radio" name="evaluate" value="both good">Both good<br>
-					<input type="radio" name="evaluate" value="good question">Good question<br>
-					<input type="radio" name="evaluate" value="bad question">Bad question<br>
-					edit question:<br>
-					<input class="form-control" type="text" name="amended_q" style="width:200px"/><br>
-					edit answer:<br>
-					<input class="form-control" type="text" name="amended_a" style="width:200px"/><br>
+					问题分类：
+					<fieldset id="category">
+							<input type="radio" name="category" value="0">平台使用相关<br>
+							<input type="radio" name="category" value="1">课程信息相关<br>
+							<input type="radio" name="category" value="2">简单知识点解释<br>
+							<input type="radio" name="category" value="3">复杂知识点讨论<br>
+							<input type="radio" name="category" value="4">反馈及建议<br>
+							<input type="radio" name="category" value="5">聊天及其他<br>
+							<input type="radio" name="category" value="8">预置的服务请求<br>
+					</fieldset>
+					<br>
+					问答评估：
+					<fieldset id="evaluate">
+						<input type="radio" name="evaluate" value="both good">Both good<br>
+						<input type="radio" name="evaluate" value="good question">Good question<br>
+						<input type="radio" name="evaluate" value="bad question">Bad question<br>
+					</fieldset>
+					<br>
+					edit question: <input class="form-control" type="text" name="amended_q" style="width:200px" /><br>
+					edit answer: <input class="form-control" type="text" name="amended_a" style="width:200px" /><br>
 					<input class="btn btn-default" type="submit" value="Save" />
 				</td>
 			</form>
