@@ -1,9 +1,23 @@
-<!--<form action='/extract' method="post" id="extract">
-    <input class="form-control" type="text" name="course_id"/>
-    <input class="btn btn-default" type="submit" value="提取知识点" />
-</form>
--->
-{% for course, course_name in c_n %}
-<a href="/message/{{course}}/">{{course_name}}</a>
-<br>
-{% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"><!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <ul>
+    {% for course, course_name in c_n %}
+    <li> <a href="/message/{{course}}/">{{course_name}}</a> </li>
+    {% endfor %}
+    </ul>
+</body>
+
+</html>
