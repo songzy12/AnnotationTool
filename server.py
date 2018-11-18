@@ -47,8 +47,6 @@ def main():
 def add_pre():
     # we store the annotated pair into mongo datebase
     course_id = request.form["course_id"]
-    import code
-    code.interact(local=locals())
     xiaomu.qa_annotation.insert({k: v for k, v in request.form.items()})
     return redirect('/message/'+course_id)
 
