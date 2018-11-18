@@ -32,10 +32,10 @@
 		{% for qid, q, a, time in q_a%}
 		<tr>
 			<form action='/gen_qa_pair' method="post" id="gen_qa_pair">
-				<td width=13%>{{qid}}</td>
-				<td width=13%>{{time}}</td>
+				<td width=17%>{{qid}}</td>
+				<td width=18%>{{time}}</td>
 				<td width=15%>{{q}}</td>
-				<td width=50%>{{a}}</td>
+				<td width=30%>{{a}}</td>
 
 				<input type="hidden" name="qid" value="{{qid}}" />
 				<input type="hidden" name="time" value="{{time}}" />
@@ -43,7 +43,7 @@
 				<input type="hidden" name="answer" value="{{a}}" />
 				<input type="hidden" name="course_id" value="{{course}}">
 
-				<td width=30%>
+				<td width=20%>
 					问题分类：
 					<fieldset id="category">
 							<input type="radio" name="category" value="0">平台使用相关<br>
