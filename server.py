@@ -1,14 +1,16 @@
+import sys
 import pandas as pd
 import numpy as np
+
 from flask import Flask, render_template, request, redirect, url_for
 from pymongo import MongoClient
-import sys
 
 from read_message import get_messages
+from config import DB_MONGO
 
 sys.path.append("/home/xiaomu/xiaomu")
 
-client = MongoClient('mongodb://10.0.2.180:27017')
+client = MongoClient(DB_MONGO)
 xiaomu = client.xiaomu
 
 app = Flask(__name__)
@@ -16,14 +18,14 @@ app = Flask(__name__)
 
 @app.route('/message/<course_id>/')
 def message(course_id):
-    answers, questions, times, tags = get_messages(course_id)
-    return render_template('message.html', q_a=zip(questions, answers, tags, times), course=course_id)
+    qids, answers, questions, times, tags = get_messages(course_id)
+    return render_template('message.html', q_a=zip(qids, questions, answers, tags, times), course=course_id)
 
 
 @app.route('/')
 def main():
     course_info = pd.read_csv(
-        './course_info.csv', index_col='tw_ms_courseinfo_d.id')
+        './data/course_info.csv', index_col='tw_ms_courseinfo_d.id')
     m = {k: v for k, v in zip(
         course_info['tw_ms_courseinfo_d.course_id'].values,
         course_info['tw_ms_courseinfo_d.name'].values)}
@@ -32,6 +34,7 @@ def main():
 
     cs, ns = [], []
     for course_id in course_ids:
+
         if course_id not in m:
             continue
         cs.append(course_id)
@@ -44,7 +47,7 @@ def main():
 def add_pre():
     # we store the annotated pair into mongo datebase
     course_id = request.form["course_id"]
-    xiaomu.qa_annotation.insert({k:v for k, v in request.form.items()})
+    xiaomu.qa_annotation.insert({k: v for k, v in request.form.items()})
     return redirect('/message/'+course_id)
 
 

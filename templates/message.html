@@ -14,19 +14,23 @@
 <body>
 	<table border="1" align="center" style="width:100%">
 		<tr>
+			<th> qid </th>
 			<th> time </th>
 			<th> tag </th>
 			<th> question</th>
 			<th> answer </th>
 			<th> evaluation </th>
 		</tr>
-		{% for q, a, t, time in q_a%}
+		{% for qid, q, a, t, time in q_a%}
 		<tr>
 			<form action='/gen_qa_pair' method="post" id="gen_qa_pair">
-				<td width=10%>{{time}}</td>
+				<td width=15%>{{qid}}</td>
+				<td width=15%>{{time}}</td>
 				<td width=5%>{{t}}</td>
 				<td width=15%>{{q}}</td>
 				<td width=50%>{{a}}</td>
+				
+				<input type="hidden" name="qid" value="{{qid}}" />
 				<input type="hidden" name="time" value="{{time}}" />
 				<input type="hidden" name="tag" value="{{t}}" />
 				<input type="hidden" name="question" value="{{q}}" />
