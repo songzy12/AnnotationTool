@@ -31,7 +31,7 @@
 		</tr>
 		{% for qid, q, a, time in q_a%}
 		<tr>
-			<form action='/gen_qa_pair' method="post" id="gen_qa_pair">
+			<form action='/gen_qa_pair' method="post" id="gen_qa_pair" target="hiddenFrame">
 				<td width=17%>{{qid}}</td>
 				<td width=18%>{{time}}</td>
 				<td width=15%>{{q}}</td>
@@ -67,6 +67,8 @@
 					<input class="btn btn-default" type="submit" value="Save" />
 				</td>
 			</form>
+
+			<iframe name="hiddenFrame" width="0" height="0" border="0" style="display: none;"></iframe>
 		<tr>
 			{%endfor%}
 	</table>

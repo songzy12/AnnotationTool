@@ -1,6 +1,7 @@
 import sys
 import pandas as pd
 import numpy as np
+import json
 
 from flask import Flask, render_template, request, redirect, url_for
 from pymongo import MongoClient
@@ -48,7 +49,7 @@ def add_pre():
     # we store the annotated pair into mongo datebase
     course_id = request.form["course_id"]
     xiaomu.qa_annotation.insert({k: v for k, v in request.form.items()})
-    return redirect('/message/'+course_id)
+    return json.dumps({'success': True})
 
 
 if __name__ == '__main__':
