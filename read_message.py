@@ -41,12 +41,16 @@ def get_messages(course_id):
         if q_dict[q_id]['message'] in stored_questions:
             continue
 
+        if '[    ]' in q_dict[q_id]['message']:
+            continue
+
         qid_list.append(q_id)
         q_text.append(q_dict[q_id]['message'])
-        a_text.append(v['message'] if v['message'] else (v['answers'][0]['message'] if 'answers' in v else ''))
-        
+        a_text.append(v['message'] if v['message'] else (
+            v['answers'][0]['message'] if 'answers' in v else ''))
+
         times.append(v['time'])
         tags.append(v.get('tag', -1))
 
     response = [qid_list, a_text, q_text, times, tags]
-    return [x[:10] for x in response]
+    return [x[:100] for x in response]
