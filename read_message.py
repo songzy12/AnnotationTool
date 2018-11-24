@@ -27,7 +27,7 @@ def get_messages(course_id):
     print(course_id)
 
     stored_questions = set(
-        [x['question'] for x in xiaomu.qa_annotation.find({"course_id": course_id})])
+        [x['question'] for x in xiaomu.qa_annotation.find()])
 
     qid_list, q_text, a_text, times, tags = [], [], [], [], []
     for v in a_list:
