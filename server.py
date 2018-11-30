@@ -39,21 +39,39 @@ for index, row in course_info.iterrows():
     course_id = row['tw_ms_courseinfo_d.course_id']
     # latest = xiaomu.message.find({'course_id':course_id}).sort("_id", pymongo.DESCENDING).limit(1)
     # latest = str(latest.next()['time'])
-    id2name[row['tw_ms_courseinfo_d.course_id']] = row['tw_ms_courseinfo_d.name']
+    id2name[row['tw_ms_courseinfo_d.course_id']
+            ] = row['tw_ms_courseinfo_d.name']
     c2course['-'.join(tuple(category.values()))].append([row['tw_ms_courseinfo_d.' + x] if type(row['tw_ms_courseinfo_d.' + x]) != float else ''
-                                                    for x in ['start', 'end', 'course_id', 'name']])
+                                                         for x in ['start', 'end', 'course_id', 'name']])
 for k in c2course:
     c2course[k].sort()
 
+
 @app.route('/message/<course_id>/')
 def message(course_id):
-    qids, answers, questions, times, tags = get_messages(course_id)
-    return render_template('message.html', q_a=zip(qids, questions, answers, times), course_id=course_id, name=id2name[course_id])
+    qids, answers, questions, times, tags, cnt_left = get_messages(course_id)
+    return render_template('message.html', q_a=zip(qids, questions, answers, times), course_id=course_id, name=id2name[course_id], cnt_left=cnt_left)
 
 
 @app.route('/')
 def main():
     return render_template("main.html", m=c2course)
+
+
+@app.route('/statistics')
+def statistics():
+    id2cnt = defaultdict(list)
+    for course_id, name in id2name.items():
+        cnt_left = 0
+        cnt_saved = 0
+        latest = ''
+        id2cnt[course_id].append([course_id, cnt_left, cnt_saved, latest])
+    return render_template('statistics.html', id2cnt)
+
+
+@app.route('/saved')
+def saved():
+    pass
 
 
 @app.route('/gen_qa_pair', methods=['POST'])

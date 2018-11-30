@@ -53,4 +53,4 @@ def get_messages(course_id):
         tags.append(v.get('tag', -1))
 
     response = [qid_list, a_text, q_text, times, tags]
-    return [x[:100] for x in response]
+    return [x[:100] for x in response] + [len(q_text)]
