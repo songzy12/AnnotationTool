@@ -2,6 +2,7 @@ import sys
 import pandas as pd
 import numpy as np
 import json
+from datetime import datetime
 
 from flask import Flask, render_template, request, redirect, url_for
 from pymongo import MongoClient
@@ -51,7 +52,9 @@ def main():
 def add_pre():
     # we store the annotated pair into mongo datebase
     course_id = request.form["course_id"]
-    xiaomu.qa_annotation.insert({k: v for k, v in request.form.items()})
+    item = {k: v for k, v in request.form.items()}
+    item.update({'created': datetime.now()})
+    xiaomu.qa_annotation.insert(item)
     return json.dumps({'success': True})
 
 
