@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 
 from flask import Flask, render_template, request, redirect, url_for
+import pymongo
 from pymongo import MongoClient
 
 from read_message import get_messages
@@ -18,34 +19,41 @@ xiaomu = client.xiaomu
 app = Flask(__name__)
 
 
+course_ids = xiaomu.message.distinct("course_id")
+
+course_info = pd.read_csv(
+    './data/course_info.csv', index_col='tw_ms_courseinfo_d.id')
+
+from collections import defaultdict
+c2course = defaultdict(list)
+id2name = {}
+
+print(list(course_info))
+for index, row in course_info.iterrows():
+    if row['tw_ms_courseinfo_d.course_id'] not in course_ids:
+        continue
+    try:
+        category = json.loads(row['tw_ms_courseinfo_d.category'])
+    except:
+        category = {}
+    course_id = row['tw_ms_courseinfo_d.course_id']
+    # latest = xiaomu.message.find({'course_id':course_id}).sort("_id", pymongo.DESCENDING).limit(1)
+    # latest = str(latest.next()['time'])
+    id2name[row['tw_ms_courseinfo_d.course_id']] = row['tw_ms_courseinfo_d.name']
+    c2course['-'.join(tuple(category.values()))].append([row['tw_ms_courseinfo_d.' + x] if type(row['tw_ms_courseinfo_d.' + x]) != float else ''
+                                                    for x in ['start', 'end', 'course_id', 'name']])
+for k in c2course:
+    c2course[k].sort()
+
 @app.route('/message/<course_id>/')
 def message(course_id):
     qids, answers, questions, times, tags = get_messages(course_id)
-    return render_template('message.html', q_a=zip(qids, questions, answers, times), course=course_id)
+    return render_template('message.html', q_a=zip(qids, questions, answers, times), course_id=course_id, name=id2name[course_id])
 
 
 @app.route('/')
 def main():
-    course_ids = xiaomu.message.distinct("course_id")
-
-    course_info = pd.read_csv(
-        './data/course_info.csv', index_col='tw_ms_courseinfo_d.id')
-
-    from collections import defaultdict
-    m = defaultdict(list)
-    print(list(course_info))
-    for index, row in course_info.iterrows():
-        if row['tw_ms_courseinfo_d.course_id'] not in course_ids:
-            continue
-        try:
-            category = json.loads(row['tw_ms_courseinfo_d.category'])
-        except:
-            category = {}
-        m['-'.join(tuple(category.values()))].append([row['tw_ms_courseinfo_d.' + x] if type(row['tw_ms_courseinfo_d.' + x]) != float else ''
-                                                      for x in ['start', 'end', 'course_id', 'name']])
-    for k in m:
-        m[k].sort()
-    return render_template("main.html", m=m)
+    return render_template("main.html", m=c2course)
 
 
 @app.route('/gen_qa_pair', methods=['POST'])
