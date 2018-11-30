@@ -10,14 +10,46 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 15px;
+        }
+    </style>
 </head>
 
 <body>
-    <ul>
-    {% for course, course_name in c_n %}
-    <li> <a href="/message/{{course}}/">{{course_name}}</a> </li>
+
+    {% for category in m %}
+
+    <h2>{{category}}</h2>
+
+    <table  style="width:100%">
+        <tr>
+            <th> start </th>
+            <th> end </th>
+            <th> course_id </th>
+            <th> course_name </th>
+        </tr>
+        {% for start, end, course_id, course_name in m[category] %}
+        <tr>
+            <td> {{start}} </td>
+            <td> {{end}} </td>
+            <td> {{course_id}} </td>
+            <td> <a href="/message/{{course_id}}/">{{course_name}} </a></td>
+        </tr>
+
+        {% endfor %}
+    </table>
     {% endfor %}
-    </ul>
+
 </body>
 
 </html>

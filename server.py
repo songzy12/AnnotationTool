@@ -25,23 +25,26 @@ def message(course_id):
 
 @app.route('/')
 def main():
-    course_info = pd.read_csv(
-        './data/course_info.csv', index_col='tw_ms_courseinfo_d.id')
-    m = {k: v for k, v in zip(
-        course_info['tw_ms_courseinfo_d.course_id'].values,
-        course_info['tw_ms_courseinfo_d.name'].values)}
-
     course_ids = xiaomu.message.distinct("course_id")
 
-    cs, ns = [], []
-    for course_id in course_ids:
+    course_info = pd.read_csv(
+        './data/course_info.csv', index_col='tw_ms_courseinfo_d.id')
 
-        if course_id not in m:
+    from collections import defaultdict
+    m = defaultdict(list)
+    print(list(course_info))
+    for index, row in course_info.iterrows():
+        if row['tw_ms_courseinfo_d.course_id'] not in course_ids:
             continue
-        cs.append(course_id)
-        ns.append(m[course_id])
-
-    return render_template("main.html", c_n=zip(cs, ns))
+        try:
+            category = json.loads(row['tw_ms_courseinfo_d.category'])
+        except:
+            category = {}
+        m['-'.join(tuple(category.values()))].append([row['tw_ms_courseinfo_d.' + x] if type(row['tw_ms_courseinfo_d.' + x]) != float else ''
+                                                      for x in ['start', 'end', 'course_id', 'name']])
+    for k in m:
+        m[k].sort()
+    return render_template("main.html", m=m)
 
 
 @app.route('/gen_qa_pair', methods=['POST'])

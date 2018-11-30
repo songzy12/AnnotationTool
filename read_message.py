@@ -10,7 +10,7 @@ message = xiaomu.message
 
 def get_messages(course_id):
     message_set = message.find(
-        {'course_id': course_id, 'flag': {"$in": [None, 'more', 'try', "cached", "cached_more"]}}).sort('_id', -1)
+        {'course_id': course_id, 'flag': {"$in": [None, 'more']}}).sort('_id', -1)
 
     q_dict, a_list = {}, []
     for m in message_set:
