@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"><!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <table style="width:100%">
+        <tr>
+            <th> latest </th>
+            <th> course_id </th>
+            <th> course_name </th>
+            <th> cnt_labeled </th>
+            <th> cnt_unlabeled </th>
+        </tr>
+        {% for latest, cnt_unlabeled, course_id, course_name, cnt_labeled in l %}
+        <tr>
+            <td> {{latest}} </td>
+            <td> <a href="/unlabeled/{{course_id}}/"> {{course_id}} </a></td>
+            <td> {{course_name}} </td>
+            <td> {{cnt_labeled}} </td>
+            <td> {{cnt_unlabeled}} </td>
+        </tr>
+
+        {% endfor %}
+    </table>
+
+</body>
+
+</html>

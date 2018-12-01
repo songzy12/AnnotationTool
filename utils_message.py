@@ -8,7 +8,7 @@ xiaomu = client.xiaomu
 message = xiaomu.message
 
 
-def get_messages(course_id):
+def get_unlabeled(course_id):
     message_set = message.find(
         {'course_id': course_id, 'flag': {"$in": [None, 'more']}}).sort('_id', -1)
 
@@ -26,7 +26,7 @@ def get_messages(course_id):
 
     print(course_id)
 
-    stored_questions = set(
+    labeled_questions = set(
         [x['question'] for x in xiaomu.qa_annotation.find()])
 
     qid_list, q_text, a_text, times, tags = [], [], [], [], []
@@ -38,7 +38,7 @@ def get_messages(course_id):
         if q_id not in q_dict:
             continue
 
-        if q_dict[q_id]['message'] in stored_questions:
+        if q_dict[q_id]['message'] in labeled_questions:
             continue
 
         if '[    ]' in q_dict[q_id]['message']:
@@ -54,3 +54,6 @@ def get_messages(course_id):
 
     response = [qid_list, a_text, q_text, times, tags]
     return [x[:100] for x in response] + [len(q_text)]
+
+def get_labeled(course_id):
+    return [], [], [], [], [], 0

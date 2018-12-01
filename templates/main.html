@@ -26,12 +26,13 @@
 </head>
 
 <body>
+    <h2> <a href="/statistics"> 统计数据 </a></h2>
 
     {% for category in m %}
 
     <h2>{{category}}</h2>
 
-    <table  style="width:100%">
+    <table style="width:100%">
         <tr>
             <th> start </th>
             <th> end </th>
@@ -42,8 +43,8 @@
         <tr>
             <td> {{start}} </td>
             <td> {{end}} </td>
-            <td> {{course_id}} </td>
-            <td> <a href="/message/{{course_id}}/">{{course_name}} </a></td>
+            <td> <a href="/unlabeled/{{course_id}}/">{{course_id}} </a></td>
+            <td> {{course_name}} </td>
         </tr>
 
         {% endfor %}
