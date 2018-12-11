@@ -79,15 +79,23 @@ def statistics():
     for course_id, course_name in id2name.items():
         print(course_id)
         message_set = xiaomu.message.find(
-            {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}})
+            {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}})
         message_set = list(message_set)
+        items = xiaomu.message.find({'course_id': course_id, 'type': 'answer', 'flag': {"$in": [None, 'more']}})
+        items = list(filter(lambda x: 'message' in x, items))
+        
+        origin_question_ids = set()
+        for item in items:
+            if 'origin_question' in item:
+                origin_question_ids.add(item['origin_question'])
 
         latest = ''
         if message_set:
             latest = str(message_set[-1]['time'])
 
-        cnt_unlabeled = len(
-            list(filter(lambda x: x['message'] not in labeled_questions, message_set)))
+        # cnt_unlabeled = get_unlabeled(course_id)[-1]
+        cnt_unlabeled = len(list(filter(lambda x: x not in labeled_questions and '[    ]' not in x, set(
+            map(lambda x: x['message'], filter(lambda x: x['_id'] in origin_question_ids, message_set))))))
 
         cnt_labeled = xiaomu.qa_annotation.find(
             {'course_id': course_id}).count()
@@ -99,10 +107,9 @@ def statistics():
                 {'course_id': course_id, 'category': str(i)}).count()
             tags_distribution.append(cnt)
 
-        l.append([latest, cnt_unlabeled, course_id, course_name, cnt_labeled, tags_distribution])
+        l.append([latest, cnt_unlabeled, course_id,
+                  course_name, cnt_labeled, tags_distribution])
     l.sort(reverse=True)
-    # import code
-    # code.interact(local=locals())
     return render_template('statistics.html', l=l)
 
 

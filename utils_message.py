@@ -10,14 +10,14 @@ message = xiaomu.message
 
 def get_unlabeled(course_id):
     message_set = message.find(
-        {'course_id': course_id, 'flag': {"$in": [None, 'more']}}).sort('_id', -1)
+        {'course_id': course_id, 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}}).sort('_id', -1)
 
     q_dict, a_list = {}, []
     for m in message_set:
         if 'message' not in m.keys():
             continue
 
-        if m['type'] == 'question' and m.get('question_source', None) not in ['wobudong', 'active_question']:
+        if m['type'] == 'question':
 
             q_dict[m['_id']] = m
 
@@ -53,7 +53,7 @@ def get_unlabeled(course_id):
         tags.append(v.get('tag', -1))
 
     response = [qid_list, a_text, q_text, times, tags]
-    return [x[:100] for x in response] + [len(q_text)]
+    return [x[:100] for x in response] + [len(set(q_text))]
 
 def get_labeled(course_id):
     return [], [], [], [], [], 0
