@@ -28,6 +28,28 @@ from collections import defaultdict
 c2course = defaultdict(list)
 id2name = {}
 
+
+labeled_questions = set(
+    [x['question'] for x in xiaomu.qa_annotation.find()])
+
+
+def get_cnt_unlabeled(course_id):
+    print(course_id)
+    message_set = xiaomu.message.find(
+        {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}})
+    message_set = list(message_set)
+    items = xiaomu.message.find(
+        {'course_id': course_id, 'type': 'answer', 'flag': {"$in": [None, 'more']}})
+    items = list(filter(lambda x: 'message' in x, items))
+
+    origin_question_ids = set()
+    for item in items:
+        if 'origin_question' in item:
+            origin_question_ids.add(item['origin_question'])
+    return len(list(filter(lambda x: x not in labeled_questions and '[    ]' not in x, set(
+        map(lambda x: x['message'], filter(lambda x: x['_id'] in origin_question_ids, message_set))))))
+
+
 print(list(course_info))
 for index, row in course_info.iterrows():
     if row['tw_ms_courseinfo_d.course_id'] not in course_ids:
@@ -37,6 +59,11 @@ for index, row in course_info.iterrows():
     except:
         category = {}
     course_id = row['tw_ms_courseinfo_d.course_id']
+
+    cnt_unlabeled = get_cnt_unlabeled(course_id)
+    if cnt_unlabeled < 10:
+        continue
+
     id2name[row['tw_ms_courseinfo_d.course_id']
             ] = row['tw_ms_courseinfo_d.name']
     c2course['-'.join(tuple(category.values()))].append([row['tw_ms_courseinfo_d.' + x] if type(row['tw_ms_courseinfo_d.' + x]) != float else ''
@@ -73,29 +100,17 @@ tags = {
 def statistics():
     l = []
 
-    labeled_questions = set(
-        [x['question'] for x in xiaomu.qa_annotation.find()])
-
     for course_id, course_name in id2name.items():
         print(course_id)
         message_set = xiaomu.message.find(
             {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}})
         message_set = list(message_set)
-        items = xiaomu.message.find({'course_id': course_id, 'type': 'answer', 'flag': {"$in": [None, 'more']}})
-        items = list(filter(lambda x: 'message' in x, items))
-
-        origin_question_ids = set()
-        for item in items:
-            if 'origin_question' in item:
-                origin_question_ids.add(item['origin_question'])
 
         latest = ''
         if message_set:
             latest = str(max([x['time'] for x in message_set]))
 
-        # cnt_unlabeled = get_unlabeled(course_id)[-1]
-        cnt_unlabeled = len(list(filter(lambda x: x not in labeled_questions and '[    ]' not in x, set(
-            map(lambda x: x['message'], filter(lambda x: x['_id'] in origin_question_ids, message_set))))))
+        cnt_unlabeled = get_cnt_unlabeled(course_id)
 
         cnt_labeled = xiaomu.qa_annotation.find(
             {'course_id': course_id}).count()
