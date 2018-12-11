@@ -79,11 +79,11 @@ def statistics():
     for course_id, course_name in id2name.items():
         print(course_id)
         message_set = xiaomu.message.find(
-            {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}})
+            {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}}).sort('_id', -1)
         message_set = list(message_set)
         items = xiaomu.message.find({'course_id': course_id, 'type': 'answer', 'flag': {"$in": [None, 'more']}})
         items = list(filter(lambda x: 'message' in x, items))
-        
+
         origin_question_ids = set()
         for item in items:
             if 'origin_question' in item:
@@ -91,7 +91,7 @@ def statistics():
 
         latest = ''
         if message_set:
-            latest = str(message_set[-1]['time'])
+            latest = str(message_set[0]['time'])
 
         # cnt_unlabeled = get_unlabeled(course_id)[-1]
         cnt_unlabeled = len(list(filter(lambda x: x not in labeled_questions and '[    ]' not in x, set(
