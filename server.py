@@ -103,13 +103,12 @@ def statistics():
     for course_id, course_name in id2name.items():
         print(course_id)
         message_set = xiaomu.message.find(
-            {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}})
+            {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}}).sort('_id', -1)
         message_set = list(message_set)
 
         latest = ''
         if message_set:
             latest = str(max([x['time'] for x in message_set]))
-
         cnt_unlabeled = get_cnt_unlabeled(course_id)
 
         cnt_labeled = xiaomu.qa_annotation.find(
