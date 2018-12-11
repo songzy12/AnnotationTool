@@ -103,7 +103,7 @@ def statistics():
     for course_id, course_name in id2name.items():
         print(course_id)
         message_set = xiaomu.message.find(
-            {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}}).sort('_id', -1)
+            {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}})
         message_set = list(message_set)
 
         latest = ''
