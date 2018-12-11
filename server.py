@@ -56,6 +56,19 @@ def main():
     return render_template("main.html", m=c2course)
 
 
+tags = {
+    0: "平台使用相关",
+    1: "课程信息相关",
+    2: "简单知识点解释",
+    3: "复杂知识点讨论",
+    4: "共性的反馈及建议",
+    5: "聊天及其他",
+    6: "个人相关的请求",
+    7: "无意义或不适宜的内容",
+    8: "预置的服务请求"
+}
+
+
 @app.route('/statistics')
 def statistics():
     l = []
@@ -70,15 +83,23 @@ def statistics():
         message_set = list(message_set)
 
         latest = ''
-        if message_set:            
+        if message_set:
             latest = str(message_set[-1]['time'])
 
-        cnt_unlabeled = len(list(filter(lambda x: x['message'] not in labeled_questions, message_set)))
+        cnt_unlabeled = len(
+            list(filter(lambda x: x['message'] not in labeled_questions, message_set)))
 
-        cnt_labeled=xiaomu.qa_annotation.find(
+        cnt_labeled = xiaomu.qa_annotation.find(
             {'course_id': course_id}).count()
 
-        l.append([latest, cnt_unlabeled, course_id, course_name, cnt_labeled])
+        tags_distribution = []
+
+        for i in range(9):
+            cnt = xiaomu.qa_annotation.find(
+                {'course_id': course_id, 'category': str(i)}).count()
+            tags_distribution.append(cnt)
+
+        l.append([latest, cnt_unlabeled, course_id, course_name, cnt_labeled, tags_distribution])
     l.sort(reverse=True)
     # import code
     # code.interact(local=locals())
@@ -87,15 +108,15 @@ def statistics():
 
 @app.route('/labeled/<course_id>/')
 def labeled(course_id):
-    qids, answers, questions, times, tags, cnt_left=get_labeled(course_id)
+    qids, answers, questions, times, tags, cnt_left = get_labeled(course_id)
     return render_template('message.html', q_a=zip(qids, questions, answers, times), course_id=course_id, name=id2name[course_id], cnt_left=cnt_left)
 
 
 @app.route('/gen_qa_pair', methods=['POST'])
 def add_pre():
     # we store the annotated pair into mongo datebase
-    course_id=request.form["course_id"]
-    item={k: v for k, v in request.form.items()}
+    course_id = request.form["course_id"]
+    item = {k: v for k, v in request.form.items()}
     item.update({'created': datetime.now()})
     xiaomu.qa_annotation.insert(item)
     return json.dumps({'success': True})

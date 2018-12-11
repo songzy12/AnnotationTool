@@ -32,16 +32,28 @@
             <th> latest </th>
             <th> course_id </th>
             <th> course_name </th>
-            <th> cnt_labeled </th>
+            <th> cnt_labeled </th>            
             <th> cnt_unlabeled </th>
+            <th> 0: 平台使用相关 </th>
+            <th> 1: 课程信息相关 </th>
+            <th> 2: 简单知识点解释 </th>
+            <th> 3: 复杂知识点讨论 </th>
+            <th> 4: 共性的反馈及建议 </th>
+            <th> 5: 聊天及其他 </th>
+            <th> 6: 个人相关的请求 </th>
+            <th> 7: 无意义或不适宜的内容 </th>
+            <th> 8: 预置的服务请求 </th>
         </tr>
-        {% for latest, cnt_unlabeled, course_id, course_name, cnt_labeled in l %}
+        {% for latest, cnt_unlabeled, course_id, course_name, cnt_labeled, tags_distribution in l %}
         <tr>
             <td> {{latest}} </td>
             <td> <a href="/unlabeled/{{course_id}}/"> {{course_id}} </a></td>
             <td> {{course_name}} </td>
             <td> {{cnt_labeled}} </td>
             <td> {{cnt_unlabeled}} </td>
+            {% for num in tags_distribution %}
+            <td> {{num}} </td>
+            {% endfor %}
         </tr>
 
         {% endfor %}
