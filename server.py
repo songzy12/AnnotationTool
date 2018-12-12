@@ -96,6 +96,13 @@ tags = {
 }
 
 
+@app.route('/record')
+def record():
+    items = xiaomu.qa_annotation.find()
+    from collections import Counter
+    c = Counter([str(x['created'].date()) for x in items if 'created' in x])
+    return render_template('record.html', m = [(a, c[a]) for a in sorted(c.keys(), reverse=True)])
+
 @app.route('/statistics')
 def statistics():
     l = []
