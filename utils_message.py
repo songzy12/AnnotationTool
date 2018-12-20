@@ -53,7 +53,7 @@ def get_unlabeled(course_id):
         tags.append(v.get('tag', -1))
 
     response = [qid_list, a_text, q_text, times, tags]
-    return [x[:100] for x in response] + [len(set(q_text))]
+    return [x for x in response] + [len(set(q_text))]
 
 def get_labeled(course_id):
     return [], [], [], [], [], 0

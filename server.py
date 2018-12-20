@@ -29,12 +29,7 @@ c2course = defaultdict(list)
 id2name = {}
 
 
-labeled_questions = set(
-    [x['question'] for x in xiaomu.qa_annotation.find()])
-
-
-def get_cnt_unlabeled(course_id):
-    print(course_id)
+def get_cnt_unlabeled(course_id, labeled_questions):
     message_set = xiaomu.message.find(
         {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}})
     message_set = list(message_set)
@@ -46,8 +41,9 @@ def get_cnt_unlabeled(course_id):
     for item in items:
         if 'origin_question' in item:
             origin_question_ids.add(item['origin_question'])
-    return len(list(filter(lambda x: x not in labeled_questions and '[    ]' not in x, set(
-        map(lambda x: x['message'], filter(lambda x: x['_id'] in origin_question_ids, message_set))))))
+    unlabeled = list(filter(lambda x: x['message'] not in labeled_questions and '[    ]' not in x['message']
+                            and x['_id'] in origin_question_ids, message_set))
+    return len(set([x['message'] for x in unlabeled])), max([x['time'] for x in unlabeled]) if unlabeled else ''
 
 
 print(list(course_info))
@@ -60,14 +56,10 @@ for index, row in course_info.iterrows():
         category = {}
     course_id = row['tw_ms_courseinfo_d.course_id']
 
-    cnt_unlabeled = get_cnt_unlabeled(course_id)
-    if cnt_unlabeled < 10:
-        continue
-
     id2name[row['tw_ms_courseinfo_d.course_id']
             ] = row['tw_ms_courseinfo_d.name']
     c2course['-'.join(tuple(category.values()))].append([row['tw_ms_courseinfo_d.' + x] if type(row['tw_ms_courseinfo_d.' + x]) != float else ''
-                                                         for x in ['start', 'end', 'course_id', 'name']])
+                                                         for x in ['course_id', 'name']])
 for k in c2course:
     c2course[k].sort()
 
@@ -101,10 +93,13 @@ def record():
     items = xiaomu.qa_annotation.find()
     from collections import Counter
     c = Counter([str(x['created'].date()) for x in items if 'created' in x])
-    return render_template('record.html', m = [(a, c[a]) for a in sorted(c.keys(), reverse=True)])
+    return render_template('record.html', m=[(a, c[a]) for a in sorted(c.keys(), reverse=True)])
+
 
 @app.route('/statistics')
 def statistics():
+    labeled_questions = set(
+        [x['question'] for x in xiaomu.qa_annotation.find()])
     l = []
 
     for course_id, course_name in id2name.items():
@@ -113,10 +108,7 @@ def statistics():
             {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}})
         message_set = list(message_set)
 
-        latest = ''
-        if message_set:
-            latest = str(max([x['time'] for x in message_set]))
-        cnt_unlabeled = get_cnt_unlabeled(course_id)
+        cnt_unlabeled, latest = get_cnt_unlabeled(course_id, labeled_questions)
 
         cnt_labeled = xiaomu.qa_annotation.find(
             {'course_id': course_id}).count()
@@ -127,7 +119,8 @@ def statistics():
             cnt = xiaomu.qa_annotation.find(
                 {'course_id': course_id, 'category': str(i)}).count()
             tags_distribution.append(cnt)
-
+        if not cnt_unlabeled:
+            continue
         l.append([latest, cnt_unlabeled, course_id,
                   course_name, cnt_labeled, tags_distribution])
     l.sort(reverse=True)

@@ -10,10 +10,28 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 15px;
+        }
+        h2 {
+            display: inline;
+            padding: 15px;
+        }
+    </style>
 </head>
 
 <body>
-    <h2><a href="/" class="button">返回首页</a> </h2>
+    
+        <div class="tab">
+            <h2 ><a href="/">课程分类</a></h2>
+            <h2 ><a href="/statistics">统计数据</a></h2>
+            <h2 ><a href="/record">工作记录</a></h2>
+        </div>
     <ul>
         {% for time, count in m %}
         <li>{{time}}: {{count}}</li>
