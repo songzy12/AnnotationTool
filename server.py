@@ -34,7 +34,7 @@ def get_cnt_unlabeled(course_id, labeled_questions):
         {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}})
     message_set = list(message_set)
     items = xiaomu.message.find(
-        {'course_id': course_id, 'type': 'answer', 'flag': {"$in": [None, 'more']}})
+        {'course_id': course_id, 'type': 'answer', 'flag': {"$in": [None, 'more', ""]}})
     items = list(filter(lambda x: 'message' in x, items))
 
     origin_question_ids = set()
