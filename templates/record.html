@@ -34,7 +34,7 @@
         </div>
     <ul>
         {% for time, count in m %}
-        <li>{{time}}: {{count}}</li>
+        <li> <a href="/record_date/{{time}}">{{time}}</a>: {{count}}</li>
         {% endfor %}
     </ul>
 </body>

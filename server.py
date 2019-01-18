@@ -2,14 +2,18 @@ import sys
 import pandas as pd
 import numpy as np
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import Flask, render_template, request, redirect, url_for
+from flask import jsonify, Response
+
 import pymongo
 from pymongo import MongoClient
 
 from utils_message import get_unlabeled, get_labeled
 from config import DB_MONGO
+
+from bson.json_util import dumps
 
 sys.path.append("/home/xiaomu/xiaomu")
 
@@ -17,7 +21,7 @@ client = MongoClient(DB_MONGO)
 xiaomu = client.xiaomu
 
 app = Flask(__name__)
-
+app.config['JSON_AS_ASCII'] = False
 
 course_ids = xiaomu.message.distinct("course_id")
 
@@ -87,13 +91,19 @@ tags = {
     8: "预置的服务请求"
 }
 
-
 @app.route('/record')
 def record():
     items = xiaomu.qa_annotation.find()
     from collections import Counter
     c = Counter([str(x['created'].date()) for x in items if 'created' in x])
     return render_template('record.html', m=[(a, c[a]) for a in sorted(c.keys(), reverse=True)])
+
+@app.route('/record_date/<date>')
+def record_date(date):
+    date = datetime.strptime(date, '%Y-%m-%d')
+    items = xiaomu.qa_annotation.find({'created':{"$gte": date,"$lt": date+timedelta(1)}}).sort("created", pymongo.DESCENDING) 
+    return jsonify([x['question'] for x in items])
+
 
 
 @app.route('/statistics')
