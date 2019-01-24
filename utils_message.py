@@ -5,6 +5,7 @@ import time
 
 client = MongoClient('mongodb://10.0.2.180:27017')
 xiaomu = client.xiaomu
+xiaomu_random_question = client.xiaomu_random_question
 message = xiaomu.message
 
 
@@ -26,6 +27,8 @@ def get_unlabeled(course_id):
 
     print(course_id)
 
+    concepts = set([x['concept'] for x in xiaomu.kp.find()])
+    active_questions = set([x["content"] if x["question_type"] != 'keyword' else "什么是%s？" % (x['content']) for x in xiaomu_random_question.ques.find() ])
     labeled_questions = set(
         [x['question'] for x in xiaomu.qa_annotation.find()])
 
@@ -38,7 +41,9 @@ def get_unlabeled(course_id):
         if q_id not in q_dict:
             continue
 
-        if q_dict[q_id]['message'] in labeled_questions:
+        if q_dict[q_id]['message'] in labeled_questions or \
+                q_dict[q_id]['message'] in concepts or \
+                q_dict[q_id]['message'] in active_questions:
             continue
 
         if '[    ]' in q_dict[q_id]['message']:
@@ -60,6 +65,7 @@ def get_unlabeled(course_id):
 
     response = [qid_list, a_text, q_text, times, tags]
     return [x[:100] for x in response] + [len(set(q_text))]
+
 
 def get_labeled(course_id):
     return [], [], [], [], [], 0
