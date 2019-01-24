@@ -19,6 +19,7 @@ sys.path.append("/home/xiaomu/xiaomu")
 
 client = MongoClient(DB_MONGO)
 xiaomu = client.xiaomu
+xiaomu_random_question = client.xiaomu_random_question
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -108,8 +109,12 @@ def record_date(date):
 
 @app.route('/statistics')
 def statistics():
+    concepts = set([x['concept'] for x in xiaomu.kp.find()])
+    active_questions = set([x["content"] if x["question_type"] != 'keyword' else "什么是%s？" % (x['content']) for x in xiaomu_random_question.ques.find() ])
     labeled_questions = set(
         [x['question'] for x in xiaomu.qa_annotation.find()])
+
+    labeled_questions = labeled_questions.union(active_questions).union(concepts)
     l = []
 
     for course_id, course_name in id2name.items():
