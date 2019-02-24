@@ -1,0 +1,70 @@
+<html>
+
+<head>
+    <meta charset="utf-8"><!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+        table {
+            max-width: 100%;
+        }
+
+        table td {
+            word-break: break-all;
+        }
+
+        h2 {
+            display: inline;
+            padding: 15px;
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <h1>答案选择标注</h1>
+
+    <table border="1" align="center" style="width:100%">
+        <tr>
+            <th width=17%> qid </th>
+            <th width=18%> time </th>
+            <th width=20%> question</th>
+            <th width=45%> candidates </th>
+        </tr>
+        {% for qid, time, question, candidates in elements%}
+        <tr>
+            <form action='/label_answer' method="post" id="gen_qa_pair" target="hiddenFrame">
+                <td>{{qid}}</td>
+                <td>{{time}}</td>
+                <td>{{question}}</td>
+
+                <input type="hidden" name="qid" value="{{qid}}" />
+                <input type="hidden" name="time" value="{{time}}" />
+                <input type="hidden" name="question" value="{{question}}" />
+                <input type="hidden" name="candidates" value="{{candidates}}">
+
+                <td>
+                    <fieldset id="answer">
+                        {% for q, a in candidates %}
+                        <input type="radio" name="evaluate" value="{{a}}"> {{q}}:<br> {{a}}<br><br>
+                        {% endfor %}
+                    </fieldset>
+                    <input class="btn btn-default" type="submit" value="Save" />
+                </td>
+            </form>
+
+            <iframe name="hiddenFrame" width="0" height="0" border="0" style="display: none;"></iframe>
+        <tr>
+        {% endfor %}
+    </table>
+</body>
+
+
+</html>
