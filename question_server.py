@@ -163,7 +163,7 @@ def statistics():
         cnt_unlabeled = len(set([x['message'] for x in unlabeled]))
         latest = max([x['time'] for x in unlabeled]) if unlabeled else ''
 
-        cnt_labeled = len([x['course_id'] == course_id for x in labeled_all])
+        cnt_labeled = len([x for x in labeled_all if x['course_id'] == course_id])
 
         tags_distribution = []
 
