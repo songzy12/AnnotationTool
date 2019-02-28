@@ -24,7 +24,7 @@ log.setLevel(logging.INFO)
 ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 ch.setFormatter(formatter)
 log.addHandler(ch)
 
@@ -60,6 +60,7 @@ def get_cnt_unlabeled(course_id, labeled_questions):
     unlabeled = list(filter(lambda x: x['message'] not in labeled_questions and '[    ]' not in x['message']
                             and x['_id'] in origin_question_ids, message_set))
     return len(set([x['message'] for x in unlabeled])), max([x['time'] for x in unlabeled]) if unlabeled else ''
+
 
 log.info(len(course_info))
 
@@ -103,6 +104,7 @@ tags = {
     8: "预置的服务请求"
 }
 
+
 @app.route('/record')
 def record():
     items = xiaomu.qa_annotation.find()
@@ -111,12 +113,13 @@ def record():
     c = Counter([str(x['created'].date()) for x in items if 'created' in x])
     return render_template('record.html', m=[(a, c[a]) for a in sorted(c.keys(), reverse=True)])
 
+
 @app.route('/record_date/<date>')
 def record_date(date):
     date = datetime.strptime(date, '%Y-%m-%d')
-    items = xiaomu.qa_annotation.find({'created':{"$gte": date,"$lt": date+timedelta(1)}}).sort("created", pymongo.DESCENDING)
+    items = xiaomu.qa_annotation.find(
+        {'created': {"$gte": date, "$lt": date+timedelta(1)}}).sort("created", pymongo.DESCENDING)
     return jsonify([x['question'] for x in items])
-
 
 
 @app.route('/statistics')
@@ -124,18 +127,22 @@ def statistics():
     log.info('>>> statistics')
     concepts = set([x['concept'] for x in xiaomu.kp.find()])
     log.info('concepts: %d' % len(concepts))
-    active_questions = set([x["content"] if x["question_type"] != 'keyword' else "什么是%s？" % (x['content']) for x in xiaomu_random_question.ques.find() ])
+    active_questions = set([x["content"] if x["question_type"] != 'keyword' else "什么是%s？" % (
+        x['content']) for x in xiaomu_random_question.ques.find()])
     log.info('active_questions: %d' % len(active_questions))
     labeled_questions = set(
         [x['question'] for x in xiaomu.qa_annotation.find()])
     log.info('labeled_questions: %d' % len(labeled_questions))
 
-    labeled_questions = labeled_questions.union(active_questions).union(concepts)
+    labeled_questions = labeled_questions.union(
+        active_questions).union(concepts)
     log.info('labeled_questions: %d' % len(labeled_questions))
 
-    question_all = list(xiaomu.message.find({'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}}))
+    question_all = list(xiaomu.message.find({'type': 'question', 'flag': {"$in": [
+                        None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}}))
     log.info('question_all: %d' % len(question_all))
-    answer_all = list(xiaomu.message.find({'type': 'answer', 'flag': {"$in": [None, 'more', ""]}}))
+    answer_all = list(xiaomu.message.find(
+        {'type': 'answer', 'flag': {"$in": [None, 'more', ""]}}))
     answer_all = list([x for x in answer_all if 'message' in x])
     log.info('answer_all: %d' % len(answer_all))
     labeled_all = list(xiaomu.qa_annotation.find())
@@ -149,17 +156,20 @@ def statistics():
 
         items = [x for x in answer_all if x['course_id'] == course_id]
 
-        origin_question_ids = set([x['origin_question'] for x in items if 'origin_question' in x])
+        origin_question_ids = set([x['origin_question']
+                                   for x in items if 'origin_question' in x])
         unlabeled = list(filter(lambda x: x['message'] not in labeled_questions and '[    ]' not in x['message']
                                 and x['_id'] in origin_question_ids, message_set))
         cnt_unlabeled = len(set([x['message'] for x in unlabeled]))
+        latest = max([x['time'] for x in unlabeled]) if unlabeled else ''
 
-        cnt_labeled = len(filter(lambda x: x['course_id'] == course_id), labeled_all)
+        cnt_labeled = len([x['course_id'] == course_id for x in labeled_all])
 
         tags_distribution = []
 
         for i in range(9):
-            cnt = len(filter(lambda x: x['course_id'] == course_id and x['category'] == str(i)))
+            cnt = len([x for x in labeled_all if x['course_id'] ==
+                       course_id and x.get('category', "") == str(i)])
             tags_distribution.append(cnt)
 
         if not cnt_unlabeled:
