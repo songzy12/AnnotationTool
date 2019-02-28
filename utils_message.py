@@ -25,8 +25,6 @@ def get_unlabeled(course_id):
         if m['type'] == 'answer':
             a_list.append(m)
 
-    print(course_id)
-
     concepts = set([x['concept'] for x in xiaomu.kp.find()])
     active_questions = set([x["content"] if x["question_type"] != 'keyword' else "什么是%s？" % (x['content']) for x in xiaomu_random_question.ques.find() ])
     labeled_questions = set(
