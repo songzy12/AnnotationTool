@@ -143,7 +143,7 @@ def statistics():
     log.info('question_all: %d' % len(question_all))
     answer_all = list(xiaomu.message.find(
         {'type': 'answer', 'flag': {"$in": [None, 'more', ""]}}))
-    answer_all = list([x for x in answer_all if 'message' in x or 'answers' in x])
+    answer_all = list([x for x in answer_all if 'message' in x and x['message'] or 'answers' in x])
     log.info('answer_all: %d' % len(answer_all))
     labeled_all = list(xiaomu.qa_annotation.find())
     log.info('labeled_all: %d' % len(labeled_all))
