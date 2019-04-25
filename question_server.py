@@ -81,7 +81,7 @@ for k in c2course:
     c2course[k].sort()
 
 
-@app.route('/unlabeled/<course_id>/')
+@app.route('/unlabeled/<path:course_id>/')
 def message(course_id):
     qids, answers, questions, times, tags, cnt_left = get_unlabeled(course_id)
     return render_template('message.html', q_a=zip(qids, questions, answers, times), course_id=course_id, name=id2name[course_id], cnt_left=cnt_left)
