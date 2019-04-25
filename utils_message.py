@@ -47,8 +47,7 @@ def get_unlabeled(course_id):
         if '[    ]' in q_dict[q_id]['message']:
             continue
 
-        qid_list.append(q_id)
-        q_text.append(q_dict[q_id]['message'])
+        answer = ''
         if v['message']:
             answer = v['message']
         elif 'answers' in v:
@@ -56,7 +55,14 @@ def get_unlabeled(course_id):
                 answer = v['answers']['result']['message']
             else:
                 answer = v['answers'][0]['message']
+        
+        if not answer:
+            continue
+
         a_text.append(answer)
+
+        qid_list.append(q_id)
+        q_text.append(q_dict[q_id]['message'])
 
         times.append(v['time'])
         tags.append(v.get('tag', -1))
