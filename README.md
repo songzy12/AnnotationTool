@@ -20,19 +20,19 @@
 * 端口转发配置
 * 线上访问 vpn 配置
 
-## supervisor
+## start service
 
 配置文件：
 
 ```
-vi /etc/supervisor/conf.d/annotation_tool.conf
+vi /etc/supervisor/conf.d/label_tool.conf
 ```
 
 查看及启动：
 
 ```
 sudo supervisorctl status
-sudo supervisorctl restart annotation_question
+sudo supervisorctl restart label_tool
 ```
 
 ## question_server
@@ -48,8 +48,6 @@ python question_server.py
 然后点开一个课程名，可以看到该课程 id 下的小木问答情况。
 
 我们对问答做了一定的过滤，使得结果里尽量不包含点击数据等。
-
-该部分逻辑具体可参考 `read_message.py` 里的 `get_message` 函数。
 
 具体来说：
 

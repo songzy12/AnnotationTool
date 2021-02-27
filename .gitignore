@@ -1,5 +1,5 @@
 data/
-note/
 config.py
+
 *.pyc
 .ipynb_checkpoints
