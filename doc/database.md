@@ -2,8 +2,20 @@
 
 * db: xiaomu
 * table: 
+  * kp
+  * random_question
   * message
-  * labeled_qa
+  * qa_label
+
+## KP Table
+
+* concept
+
+## Random Question Table
+
+* question_type
+  * keyword
+* content
 
 ## Message Table
 
@@ -25,7 +37,7 @@
 * time
 * tag
 
-## Labeled QA Table
+## QA Label Table
 
 * created
 * question

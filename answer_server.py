@@ -7,18 +7,18 @@ from flask import Flask, render_template, request
 import pymongo
 from pymongo import MongoClient
 
-from config import DB_MONGO, ES
+from config import MONGO_SERVICE, ES_SERVICE
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
-client = MongoClient(DB_MONGO)
+client = MongoClient(MONGO_SERVICE)
 xiaomu = client.xiaomu
 
 
 def request_es(source, payload):
     # public
-    url = ES + "/robot_{}/_search".format(source)
+    url = ES_SERVICE + "/robot_{}/_search".format(source)
     try:
         response = json.loads(requests.post(url, json=payload).text)
     except:
@@ -54,7 +54,8 @@ def get_questions(amount):
     items = xiaomu.answer_annotation.find()
     saved = set([x['qid'] for x in items])
 
-    items = xiaomu.qa_annotation.find({"category": "0"}).sort("time", pymongo.DESCENDING) 
+    items = xiaomu.qa_annotation.find(
+        {"category": "0"}).sort("time", pymongo.DESCENDING)
     cnt = 0
     for item in items:
         try:
@@ -76,7 +77,7 @@ def get_questions(amount):
             xiaomu.answer_annotation.insert(item)
             continue
 
-        if not candidates:            
+        if not candidates:
             item = {'qid': qid, 'question': question,
                     'answer': "", 'candidates': candidates, 'time': time}
             item.update({'created': datetime.now()})

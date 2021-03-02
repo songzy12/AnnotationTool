@@ -1,16 +1,21 @@
-from pymongo import MongoClient
 from datetime import datetime
-import numpy as np
 import time
 
-client = MongoClient('mongodb://10.0.2.180:27017')
-xiaomu = client.xiaomu
-xiaomu_random_question = client.xiaomu_random_question
-message = xiaomu.message
+from pymongo import MongoClient
+
+from config import MONGO_SERVICE
+
+client = MongoClient(MONGO_SERVICE)
+xiaomu_db = client.xiaomu
+
+message_table = xiaomu_db.message
+random_question_table = xiaomu_db.random_question
+qa_label_table = xiaomu_db.qa_label
+kp_table = xiaomu_db.kp
 
 
 def get_unlabeled(course_id):
-    message_set = message.find(
+    message_set = message_table.find(
         {'course_id': course_id, 'flag': {"$in": [None, 'more', ""]}, 'question_source': {"$nin": ['wobudong', 'active_question']}}).sort('_id', -1)
 
     q_dict, a_list = {}, []
@@ -25,10 +30,11 @@ def get_unlabeled(course_id):
         if m['type'] == 'answer':
             a_list.append(m)
 
-    concepts = set([x['concept'] for x in xiaomu.kp.find()])
-    active_questions = set([x["content"] if x["question_type"] != 'keyword' else "什么是%s？" % (x['content']) for x in xiaomu_random_question.ques.find() ])
+    concepts = set([x['concept'] for x in kp_table.find()])
+    active_questions = set([x["content"] if x["question_type"] != 'keyword' else "什么是%s？" % (
+        x['content']) for x in random_question_table.find()])
     labeled_questions = set(
-        [x['question'] for x in xiaomu.qa_annotation.find()])
+        [x['question'] for x in qa_label_table.find()])
 
     qid_list, q_text, a_text, times, tags = [], [], [], [], []
     for v in a_list:
@@ -55,7 +61,7 @@ def get_unlabeled(course_id):
                 answer = v['answers']['result']['message']
             else:
                 answer = v['answers'][0]['message']
-        
+
         if not answer:
             continue
 
