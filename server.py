@@ -1,19 +1,16 @@
+from datetime import datetime, timedelta
+import json
 import logging
 import sys
 
-import json
-from datetime import datetime, timedelta
 
-from flask import Flask, render_template, request, redirect, url_for
-from flask import jsonify, Response
-
+from flask import Flask, render_template, request, jsonify
 import pymongo
-from bson.json_util import dumps
 
 from config import PORT
-
-from util.db_util import message_table, random_question_table, qa_label_table, kp_table, get_unlabeled, get_labeled
-from util.data_util import get_course_info
+from util.mongo_util import message_table, random_question_table, qa_label_table, kp_table, answer_label_table, get_unlabeled_qa, get_labeled_qa
+from util.csv_util import get_course_info
+from util.es_util import get_candidates
 
 
 log = logging.getLogger(__name__)
@@ -33,26 +30,49 @@ id2name, c2course = get_course_info(course_id_list)
 log.info("Category to Course Info: {}".format(c2course))
 
 
-def get_cnt_unlabeled(course_id, labeled_questions):
-    message_set = message_table.find(
-        {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}})
-    message_set = list(message_set)
-    items = message_table.find(
-        {'course_id': course_id, 'type': 'answer', 'flag': {"$in": [None, 'more', ""]}})
-    items = list(filter(lambda x: 'message' in x or 'answers' in x, items))
+def get_question_and_candidates(amount):
+    questions = []
+    items = answer_label_table.find()
+    saved = set([x['qid'] for x in items])
 
-    origin_question_ids = set()
+    items = qa_label_table.find(
+        {"category": "0"}).sort("time", pymongo.DESCENDING)
+    cnt = 0
     for item in items:
-        if 'origin_question' in item:
-            origin_question_ids.add(item['origin_question'])
-    unlabeled = list(filter(lambda x: x['message'] not in labeled_questions and '[    ]' not in x['message']
-                            and x['_id'] in origin_question_ids, message_set))
-    return len(set([x['message'] for x in unlabeled])), max([x['time'] for x in unlabeled]) if unlabeled else ''
+        qid, question, answer, evaluate, time = item['qid'], item['question'], item['answer'], item.get(
+            'evaluate', ""), item['time']
+
+        if qid in saved:
+            continue
+
+        candidates = get_candidates(question)
+
+        if evaluate == 'both good':
+            item = {'qid': qid, 'question': question,
+                    'answer': answer, 'candidates': candidates, 'time': time}
+            item.update({'created': datetime.now()})
+            answer_label_table.insert(item)
+            continue
+
+        if not candidates:
+            item = {'qid': qid, 'question': question,
+                    'answer': "", 'candidates': candidates, 'time': time}
+            item.update({'created': datetime.now()})
+            answer_label_table.insert(item)
+            continue
+
+        questions.append([qid, time, question, candidates])
+        cnt += 1
+        if cnt == amount:
+            break
+
+    return questions
 
 
 @app.route('/unlabeled/<path:course_id>/')
 def message(course_id):
-    qids, answers, questions, times, tags, cnt_left = get_unlabeled(course_id)
+    qids, answers, questions, times, tags, cnt_left = get_unlabeled_qa(
+        course_id)
     return render_template('message.html', q_a=zip(qids, questions, answers, times), course_id=course_id, name=id2name[course_id], cnt_left=cnt_left)
 
 
@@ -153,8 +173,14 @@ def statistics():
 
 @app.route('/labeled/<course_id>/')
 def labeled(course_id):
-    qids, answers, questions, times, tags, cnt_left = get_labeled(course_id)
+    qids, answers, questions, times, tags, cnt_left = get_labeled_qa(course_id)
     return render_template('message.html', q_a=zip(qids, questions, answers, times), course_id=course_id, name=id2name[course_id], cnt_left=cnt_left)
+
+
+@app.route('/answer_selection')
+def answer_selection():
+    questions = get_question_and_candidates(100)
+    return render_template('answer_selection.html', elements=questions)
 
 
 @app.route('/gen_qa_pair', methods=['POST'])
@@ -163,6 +189,15 @@ def add_pre():
     item = {k: v for k, v in request.form.items()}
     item.update({'created': datetime.now()})
     qa_label_table.insert(item)
+    return json.dumps({'success': True})
+
+
+@app.route('/label_answer', methods=['POST'])
+def label_answer():
+    # we store the annotated pair into mongo datebase
+    item = {k: v for k, v in request.form.items()}
+    item.update({'created': datetime.now()})
+    answer_label_table.insert(item)
     return json.dumps({'success': True})
 
 

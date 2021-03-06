@@ -15,7 +15,7 @@ kp_table = xiaomu_db.kp
 answer_label_table = xiaomu_db.answer_label_table
 
 
-def get_unlabeled(course_id):
+def get_unlabeled_qa(course_id):
     message_set = message_table.find(
         {'course_id': course_id, 'flag': {"$in": [None, 'more', ""]}, 'question_source': {"$nin": ['wobudong', 'active_question']}}).sort('_id', -1)
 
@@ -78,5 +78,22 @@ def get_unlabeled(course_id):
     return [x[:100] for x in response] + [len(set(q_text))]
 
 
-def get_labeled(course_id):
+def get_labeled_qa(course_id):
     return [], [], [], [], [], 0
+
+
+def get_unlabeled_qa_cnt(course_id, labeled_questions):
+    message_set = message_table.find(
+        {'course_id': course_id, 'type': 'question', 'flag': {"$in": [None, 'more']}, 'question_source': {"$nin": ['wobudong', 'active_question']}})
+    message_set = list(message_set)
+    items = message_table.find(
+        {'course_id': course_id, 'type': 'answer', 'flag': {"$in": [None, 'more', ""]}})
+    items = list(filter(lambda x: 'message' in x or 'answers' in x, items))
+
+    origin_question_ids = set()
+    for item in items:
+        if 'origin_question' in item:
+            origin_question_ids.add(item['origin_question'])
+    unlabeled = list(filter(lambda x: x['message'] not in labeled_questions and '[    ]' not in x['message']
+                            and x['_id'] in origin_question_ids, message_set))
+    return len(set([x['message'] for x in unlabeled])), max([x['time'] for x in unlabeled]) if unlabeled else ''
