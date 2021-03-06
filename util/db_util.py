@@ -12,6 +12,7 @@ message_table = xiaomu_db.message
 random_question_table = xiaomu_db.random_question
 qa_label_table = xiaomu_db.qa_label
 kp_table = xiaomu_db.kp
+answer_label_table = xiaomu_db.answer_label_table
 
 
 def get_unlabeled(course_id):
