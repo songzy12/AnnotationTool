@@ -15,6 +15,7 @@ def get_course_info(course_id_list):
             try:
                 category = json.loads(row['category'])
             except:
+                # TODO(songzy): log a warning message here.
                 category = {}
 
             id2name[row['course_id']] = row['name']

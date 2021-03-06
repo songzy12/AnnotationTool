@@ -7,17 +7,17 @@
   * message
   * qa_label
 
-## KP Table
+### KP Table
 
 * concept
 
-## Random Question Table
+### Random Question Table
 
 * question_type
   * keyword
 * content
 
-## Message Table
+### Message Table
 
 * _id
 * course_id
@@ -37,7 +37,7 @@
 * time
 * tag
 
-## QA Label Table
+### QA Label Table
 
 * created
 * question

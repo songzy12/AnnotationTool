@@ -30,6 +30,7 @@ app.config['JSON_AS_ASCII'] = False
 
 course_id_list = message_table.distinct("course_id")
 id2name, c2course = get_course_info(course_id_list)
+log.info("Category to Course Info: {}".format(c2course))
 
 
 def get_cnt_unlabeled(course_id, labeled_questions):
