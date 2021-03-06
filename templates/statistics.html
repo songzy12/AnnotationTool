@@ -18,6 +18,7 @@
             border-collapse: collapse;
             padding: 15px;
         }
+
         h2 {
             display: inline;
             padding: 15px;
@@ -26,18 +27,18 @@
 </head>
 
 <body>
-    
-        <div class="tab">
-            <h2 ><a href="/">课程分类</a></h2>
-            <h2 ><a href="/statistics">统计数据</a></h2>
-            <h2 ><a href="/record">工作记录</a></h2>
-        </div>
+    <div class="tab">
+        <h2><a href="/">课程分类</a></h2>
+        <h2><a href="/statistics">统计数据</a></h2>
+        <h2><a href="/record">工作记录</a></h2>
+        <h2><a href="/answer_selection">答案选择标注</a></h2>
+    </div>
     <table style="width:100%">
         <tr>
             <th> latest </th>
             <th> course_id </th>
             <th> course_name </th>
-            <th> cnt_labeled </th>            
+            <th> cnt_labeled </th>
             <th> cnt_unlabeled </th>
             <th> 0: 平台使用相关 </th>
             <th> 1: 课程信息相关 </th>
@@ -60,10 +61,8 @@
             <td> {{num}} </td>
             {% endfor %}
         </tr>
-
         {% endfor %}
     </table>
-
 </body>
 
 </html>

@@ -18,6 +18,7 @@
             border-collapse: collapse;
             padding: 15px;
         }
+
         h2 {
             display: inline;
             padding: 15px;
@@ -26,12 +27,12 @@
 </head>
 
 <body>
-    
-        <div class="tab">
-            <h2 ><a href="/">课程分类</a></h2>
-            <h2 ><a href="/statistics">统计数据</a></h2>
-            <h2 ><a href="/record">工作记录</a></h2>
-        </div>
+    <div class="tab">
+        <h2><a href="/">课程分类</a></h2>
+        <h2><a href="/statistics">统计数据</a></h2>
+        <h2><a href="/record">工作记录</a></h2>
+        <h2><a href="/answer_selection">答案选择标注</a></h2>
+    </div>
     <ul>
         {% for time, count in m %}
         <li> <a href="/record_date/{{time}}">{{time}}</a>: {{count}}</li>
